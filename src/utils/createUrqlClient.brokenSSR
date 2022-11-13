@@ -1,0 +1,111 @@
+import { createClient, dedupExchange, fetchExchange, ssrExchange, } from '@urql/core';
+import {
+    Provider,
+} from 'urql';
+import { cacheExchange } from '@urql/exchange-graphcache';
+import { LogoutMutation, MeQuery, MeDocument, LoginMutation } from '../graphql/graphql';
+import { betterUpdateQuery } from './betterUpdateQuery';
+
+import { renderToString } from 'react-dom/server';
+import prepass from 'react-ssr-prepass';
+import App from '../App';
+
+
+
+const handleRequest = async (req, res) => {
+    // ...
+    const isServerSide = typeof window === 'undefined';
+
+    const ssr = ssrExchange({
+        isClient: !isServerSide,
+        // initialState: !isServerSide ? window.__URQL_DATA__ : undefined,
+    });
+
+    const client = createClient({
+        url: 'http://localhost:4000/graphql',
+        fetchOptions: {
+            credentials: "include"
+        },
+        suspense: true, // This activates urql's Suspense mode on the server-side
+        exchanges: [dedupExchange, cacheExchange({}), ssr, fetchExchange]
+    });
+
+    const element = (
+        <Provider value={client}>
+            <App />
+        </Provider>
+    );
+
+    // Using `react-ssr-prepass` this prefetches all data
+    await prepass(element);
+    // This is the usual React SSR rendering code
+    const markup = renderToString(element);
+    // Extract the data after prepass and rendering
+    const data = JSON.stringify(ssr.extractData());
+
+    res.status(200).send(`
+    <html>
+      <body>
+        <div id="root">${markup}</div>
+        <script>
+          window.__URQL_DATA__ = JSON.parse(${data});
+        </script>
+      </body>
+    </html>
+  `);
+};
+
+
+
+
+// const client = createClient({
+//     exchanges: [
+//         dedupExchange,
+//         cacheExchange,
+//         ssr, // Add `ssr` in front of the `fetchExchange`
+//         fetchExchange,
+//     ],
+// });
+
+export const createUrqlClient = (ssrExchange: any) => ({
+
+    url: 'http://localhost:4000/graphql',
+    fetchOptions: {
+        credentials: "include" as const
+    },
+    exchanges: [dedupExchange, cacheExchange({
+        updates: {
+            Mutation: {
+                logout: (_result, _args, cache, _info) => {
+                    betterUpdateQuery<LogoutMutation, MeQuery>(
+                        cache,
+                        { query: MeDocument },
+                        _result,
+                        () => ({ me: null })
+                    );
+                },
+
+                login: (_result, _args, cache, _info) => {
+                    betterUpdateQuery<LoginMutation, MeQuery>(
+                        cache,
+                        { query: MeDocument },
+                        _result,
+                        (result, query) => {
+                            if (result.login.errors) {
+                                return query;
+                            } else {
+                                return { me: result.login.user };
+                            }
+                        }
+                    );
+                },
+
+                // TODO update after register
+
+            }
+        }
+    }),
+        ssr,
+        fetchExchange],
+
+})

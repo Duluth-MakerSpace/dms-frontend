@@ -1,0 +1,13 @@
+query Users {
+  users {
+    ...BaseUser
+    name
+    phone
+    emerg_contact
+    newsletter
+    privacy_level
+    access_level
+    title
+    bio
+  }
+}
