@@ -24,12 +24,12 @@ const Register = (): JSX.Element => {
 
   const form = useForm({
     initialValues: {
-      username: '',
       email: '',
       password: '',
       name: '',
       phone: '',
-      emerg_contact: '',
+      emergPhone: '',
+      emergContact: '',
       waiverSigned: false,
       newsletter: true,
       privacyLevel: 1,
@@ -39,6 +39,7 @@ const Register = (): JSX.Element => {
       if (active === 0) {
         return {
           email: /^\S+@\S+$/.test(values.email) ? null : 'Invalid email',
+          name: !values.name.includes(' ') ? 'Please include your full name' : null,
           password:
             values.password.length < 6 ? 'Password must include at least 6 characters' : null,
         };
@@ -46,16 +47,13 @@ const Register = (): JSX.Element => {
 
       if (active === 1) {
         return {
-          // name: values.name.trim().length < 2 ? 'Name must include at least 2 characters' : null,
+          emergContact: values.emergContact.trim().length < 2 ? 'Please list emergency contact, just in case' : null,
+          emergPhone: values.emergPhone.trim().length < 2 ? 'Give an emergency phone number in case of emergency' : null,
         };
       }
 
-      if (active === 3) {
+      if (active === 2) {
         return {
-          username:
-            values.username.trim().length < 3
-              ? 'Username must include at least 3 characters'
-              : null
         }
       }
 
@@ -75,10 +73,10 @@ const Register = (): JSX.Element => {
 
 
   const people = [
-    { name: "Sam Maloof", username: "samm", email: "smaloof@email.com" },
-    { name: "George Nakashima", username: "georgen", email: "gnakashima@email.com" },
-    { name: "James Krenov", username: "jkrenov", email: "jkrenov@email.com" },
-    { name: "Norm Abram", username: "normabram", email: "nabram@email.com" }];
+    { name: "Sam Maloof", email: "smaloof@email.com" },
+    { name: "George Nakashima", email: "gnakashima@email.com" },
+    { name: "James Krenov", email: "jkrenov@email.com" },
+    { name: "Norm Abram", email: "nabram@email.com" }];
   const person = people[Math.floor(Math.random() * people.length)];
 
 
@@ -100,9 +98,10 @@ const Register = (): JSX.Element => {
                 privacyLevel: values.privacyLevel,
                 newsletter: values.newsletter,
                 password: values.password,
-                username: values.username,
+                waivered: values.waiverSigned,
                 email: values.email,
-                emergContact: values.emerg_contact,
+                emergPhone: values.emergPhone,
+                emergContact: values.emergContact,
                 phone: values.phone,
                 name: values.name
               });
@@ -118,7 +117,7 @@ const Register = (): JSX.Element => {
           )}>
             <Stepper active={active} breakpoint="sm">
               <Stepper.Step icon={<IconUser size={18} />} label="Account info" description="Required">
-                <TextInput label="Username" placeholder={person.username} {...form.getInputProps('username')} required mt="md" />
+                <TextInput label="Name" placeholder={person.name} {...form.getInputProps('name')} required mt="md" />
                 <TextInput label="Email" placeholder={person.email} {...form.getInputProps('email')} required mt="md" />
                 <PasswordInput label="Password" placeholder="Your password" {...form.getInputProps('password')} required mt="md" />
               </Stepper.Step>
@@ -137,9 +136,20 @@ const Register = (): JSX.Element => {
                       required
                       label="Phone"
                       mt="md"
-                      error={form.values.phone ? (isPossiblePhoneNumber(form.values.phone) ? null : 'Invalid phone number') : null}
+                      maxLength={14}
+                      error={form.values.phone ? (isPossiblePhoneNumber(form.values.phone) ? null : 'Invalid phone number') : 'Invalid phone number'}
                       country="US" />
-                    <TextInput label="Emergency Contact" placeholder="Name & phone number" {...form.getInputProps('emerg_contact')} required mt="md" />
+                    <PhoneInput
+                      {...form.getInputProps('emergPhone')}
+                      placeholder={DMS_PHONE}
+                      inputComponent={TextInput}
+                      required
+                      label="Emergency Contact Phone"
+                      mt="md"
+                      maxLength={14}
+                      error={form.values.emergPhone ? (isPossiblePhoneNumber(form.values.emergPhone) ? null : 'Invalid phone number') : 'Invalid phone number'}
+                      country="US" />
+                    <TextInput label="Emergency Contact" placeholder="Name" {...form.getInputProps('emergContact')} required mt="md" />
                   </SimpleGrid>
                 </Text>
               </Stepper.Step>
@@ -150,7 +160,6 @@ const Register = (): JSX.Element => {
                     You will be able to edit these profile fields and more after your account is created!
                   </Alert>
                 </Container>
-                <TextInput label="Real name (optional)" placeholder="Your name" {...form.getInputProps('name')} mt="md" />
                 <Select
                   label="Privacy level"
                   {...form.getInputProps('privacyLevel')}

@@ -1,7 +1,9 @@
 import { Carousel } from '@mantine/carousel';
 import {
+  Box,
+  Button,
   Center, Container,
-  createStyles, Flex, Paper, SimpleGrid, Title
+  createStyles, Flex, Group, Paper, SimpleGrid, Title
 } from "@mantine/core";
 import { useResizeObserver } from "@mantine/hooks";
 import dayjs from 'dayjs';
@@ -9,8 +11,9 @@ import dayjs from 'dayjs';
 import { EventCard } from "../components/EventCard";
 import { NewsCard } from '../components/NewsCard';
 import { DEFAULT_DATE } from '../constants/dateFormats';
-import { usePostsQuery } from '../graphql/graphql';
+import { usePostsQuery, useCalendarClassesQuery } from '../graphql/graphql';
 import MainLayout from "../layouts/MainLayout";
+import { formatOpenSlots } from '../utils/stringUtils';
 
 
 const useStyles = createStyles((theme, _params, getRef) => ({
@@ -64,6 +67,7 @@ const useStyles = createStyles((theme, _params, getRef) => ({
 
 const HomePage = (): JSX.Element => {
   const [{ data: news }] = usePostsQuery();
+  const [{ fetching: fetchingCalendarClasses, data: calendarClasses }] = useCalendarClassesQuery();
   const { classes } = useStyles();
   const [layoutRef] = useResizeObserver();
 
@@ -72,10 +76,12 @@ const HomePage = (): JSX.Element => {
 
   return (
     <MainLayout layoutRef={layoutRef}>
-
-      <Container size="xl" mb="lg" pt='xl'>
-        <Title color='dimmed' weight={200} size={'xl'} sx={{ textTransform: 'uppercase' }}>What's new at the</Title>
+      <Container size="xl" mb="lg">
         <Title mb='xl'>Duluth MakerSpace</Title>
+
+
+        <Title mb='xl'>News</Title>
+
         <SimpleGrid cols={2}>
           {!news
             ? null
@@ -99,109 +105,43 @@ const HomePage = (): JSX.Element => {
 
 
       <Container size="xl" mb="lg" pt='xl'>
-        <Title mb='xl'>Upcoming classes and events</Title>
-
+        <Title mb='md'>Upcoming classes and events</Title>
+        <Group mb='md'>
+          <Button component='a' href='/classes' variant='outline'>View all</Button>
+          <Button component='a' href='/calendar' variant='outline'>View calendar</Button>
+        </Group>
         <Flex wrap={'nowrap'}>
-          <Carousel
-            classNames={classes}
-            slideSize="30%"
-            slideGap="md"
-            align="start"
-            controlSize={30}>
-            <Carousel.Slide>
-              <EventCard
-                image={"https://duluthmakerspace.com/mg/C1662.jpg"}
-                link={"http://google.com"}
-                title={"Lapidary Arts 101 Class"}
-                description={"Learn basics of the lapidary arts including; ​​Rocks and Minerals- Local rocks and minerals, identification, hardness ​​Saws and tools- uses, care, safety, cutting demonstrations Arbor- demonstration and hands-on learning; forming, sanding, polishing Learn more about becoming Lapidary Studio certified."}
-                eventType="Class"
-                author={{
-                  name: "Amanda", image: "https://duluthmakerspace.com/mg/C1662.jpg"
-                }} />
-            </Carousel.Slide>
-            <Carousel.Slide>
-              <EventCard
-                image={"https://duluthmakerspace.com/mg/C36.jpg"}
-                link={"http://google.com"}
-                title={"Intro to Arduino"}
-                description={"Participants will learn about creative uses of Arduinos in educational settings, and how to wire and program simple circuits including how to blink an LED, use a button, and control a servo motor. The course serves as a way to connect local teachers with each other and a creative community workshop so they may use creative applications"}
-                eventType="Private"
-                author={{
-                  name: "Paul", image: "https://duluthmakerspace.com/mg/C36.jpg"
-                }} />
-            </Carousel.Slide>
-            <Carousel.Slide>
-              <EventCard
-                image={"https://tarus.com/wp-content/uploads/2022/03/TARUS-5-GLC-Main.webp"}
-                link={"http://google.com"}
-                title={"Big CNC Training"}
-                description={"Come test out the enormous CNC which is now functional. Learn how to make a birdhouse using the CNC. This class is required to get certified."}
-                eventType="Class"
-                author={{
-                  name: "Test", image: "https://duluthmakerspace.com/mg/C1662.jpg"
-                }} />
-            </Carousel.Slide>
-            <Carousel.Slide>
-              <EventCard
-                image={"https://duluthmakerspace.com/mg/C1662.jpg"}
-                link={"http://google.com"}
-                title={"Intro to Arduino"}
-                description={"Participants will learn about creative uses of Arduinos in educational settings, and how to wire and program simple circuits including how to blink an LED, use a button, and control a servo motor. The course serves as a way to connect local teachers with each other and a creative community workshop so they may use creative applications"}
-                eventType="Class"
-                author={{
-                  name: "Amanda", image: "https://duluthmakerspace.com/mg/C1662.jpg"
-                }} />
-            </Carousel.Slide>
-            <Carousel.Slide>
-              <EventCard
-                image={"https://duluthmakerspace.com/mg/C1662.jpg"}
-                link={"http://google.com"}
-                title={"Intro to Arduino"}
-                description={"Participants will learn about creative uses of Arduinos in educational settings, and how to wire and program simple circuits including how to blink an LED, use a button, and control a servo motor. The course serves as a way to connect local teachers with each other and a creative community workshop so they may use creative applications"}
-                eventType="Private"
-                author={{
-                  name: "Amanda", image: "https://duluthmakerspace.com/mg/C1662.jpg"
-                }} />
-            </Carousel.Slide>
 
-            <Carousel.Slide>
-              <Paper withBorder p={30}><Center>Check back soon!</Center></Paper>
-            </Carousel.Slide>
-          </Carousel>
+          {fetchingCalendarClasses
+            ? ("TODO: LOADING")
+            : (
 
-          {/* 
-          <Box ml={'xl'}>
-            <Calendar
-              allowLevelChange={false}
-              classNames={{
-                cell: classes.cell,
-                day: classes.day,
-              }}
-              value={calendarDate}
-              firstDayOfWeek="sunday"
-              onChange={setCalendarDate}
-              dayClassName={(date, modifiers) => {
-                return cx({
-                  [classes.weekend]: modifiers.weekend,
-                  [classes.outside]: modifiers.outside,
-                  [classes.event]: mockEventDates.includes(date.getDate()),
-                  [classes.selected]: modifiers.selected
-                })
-              }
-              }
-              renderDay={(date) => {
-                const day = date.getDate();
-                return (
-                  <div>
-                    <Text weight={day == 16 ? 800 : 400}>{day}</Text>
-                  </div>
-                );
-              }}
-            />
-          </Box> */}
+              <Carousel
+                classNames={classes}
+                slideSize="30%"
+                slideGap="md"
+                align="start"
+                controlSize={30}>
+
+                {calendarClasses.calendarClasses.map((c) => (
+                  <Carousel.Slide key={c.uuid}>
+                    <EventCard
+                      c={c}
+                      link={`/class/${c.uuid}`}
+                      eventType="Class"
+                    />
+                    <Box>
+
+                    </Box>
+                  </Carousel.Slide>
+                ))
+                }
+              </Carousel>
+            )
+          }
         </Flex>
-
       </Container>
+
     </MainLayout>
   );
 };

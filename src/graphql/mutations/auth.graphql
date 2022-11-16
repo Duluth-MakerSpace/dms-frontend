@@ -1,6 +1,5 @@
-mutation Login($usernameOrEmail: String!, 
-$password: String!) {
-  login(usernameOrEmail: $usernameOrEmail, 
+mutation Login($email: String!, $password: String!) {
+  login(email: $email, 
   password: $password) {
     errors {
       ...BaseError
@@ -12,23 +11,25 @@ $password: String!) {
 }
 
 mutation Register(
-  $privacyLevel: Int!, 
-  $newsletter: Boolean!, 
-  $password: String!, 
-  $username: String!, 
-  $email: String!, 
-  $emergContact: String, 
-  $phone: String, 
-  $name: String) {
-  createUser(
-    privacy_level: $privacyLevel, 
-    newsletter: $newsletter, 
-    password: $password, 
-    username: $username, 
-    email: $email, 
-    emerg_contact: $emergContact, 
-    phone: $phone, 
-    name: $name) {
+  $email: String!,
+  $name: String!,
+  $password: String!,
+  $privacyLevel: Int!,
+  $newsletter: Boolean!,
+  $waivered: Boolean!,
+  $emergContact: String!,
+  $emergPhone: String!,
+  $phone: String!) {
+    createUser(
+      privacyLevel: $privacyLevel,
+      newsletter: $newsletter,
+      waivered: $waivered,
+      emergContact: $emergContact,
+      emergPhone: $emergPhone,
+      phone: $phone,
+      password: $password,
+      name: $name,
+      email: $email) {
     errors {
       ...BaseError
     }
@@ -55,4 +56,13 @@ mutation ChangePassword($token: String!, $password: String!) {
 
 mutation Logout {
   logout
+}
+
+
+mutation RfidLogin($rfid: String!, $durationSeconds: Int) {
+  rfidLogin(rfid: $rfid, durationSeconds: $durationSeconds)
+}
+
+mutation RfidLogout($rfid: String!) {
+  rfidLogout(rfid: $rfid)
 }

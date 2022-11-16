@@ -2,7 +2,7 @@ import { Avatar, Badge, Box, Button, Center, Container, Flex, Group, Loader, Pap
 import { useResizeObserver } from "@mantine/hooks";
 import { IconAccessPoint, IconActivityHeartbeat, IconCake, IconFingerprint, IconHeartbeat, IconPhone, IconSpy } from "@tabler/icons";
 import { useNavigate, useParams } from "react-router-dom";
-import { useUserQuery } from '../graphql/graphql';
+import { useMeQuery, useUserQuery } from '../graphql/graphql';
 import MainLayout from "../layouts/MainLayout";
 import dayjs from 'dayjs';
 import { DEFAULT_DATE } from "../constants/dateFormats";
@@ -12,7 +12,7 @@ import { formatPhone } from "../utils/stringUtils";
 
 // }));
 
-const User = (): JSX.Element => {
+const Settings = (): JSX.Element => {
   const navigate = useNavigate();
   const { uuid } = useParams();
   const [{ fetching: fetchingUser, data: user }] = useUserQuery({ variables: { uuid: uuid } });
@@ -75,4 +75,4 @@ const User = (): JSX.Element => {
   );
 };
 
-export default User;
+export default Settings;

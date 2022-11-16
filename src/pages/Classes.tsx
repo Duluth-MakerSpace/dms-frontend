@@ -1,9 +1,8 @@
 import { Anchor, Avatar, Center, Container, Group, Loader, Text, Title } from "@mantine/core";
 import { useResizeObserver } from "@mantine/hooks";
-import { IconAt, IconPhoneCall } from "@tabler/icons";
-import { User, UsersQuery, useUsersQuery } from '../graphql/graphql';
+import { IconAt, IconClock, IconPhoneCall, IconUsers } from "@tabler/icons";
+import { CalendarClass, CalendarClassesQuery, useCalendarClassesQuery, User } from '../graphql/graphql';
 import MainLayout from "../layouts/MainLayout";
-import { formatPhone } from "../utils/stringUtils";
 
 
 // const useStyles = createStyles((theme, _params, getRef) => ({
@@ -12,41 +11,45 @@ import { formatPhone } from "../utils/stringUtils";
 //   },
 // }));
 
-function renderUsers(users: UsersQuery) {
+function renderClassList(classes: CalendarClassesQuery) {
   // human, identicon, initials, bottts, avataaars, jdenticon, gridy or micah
   // const avatar = "avataaars";
   const avatar = "croodles";
-  return users.users.map((u: User) => (
+  return classes.calendarClasses.map((c: CalendarClass) => (
 
-    <Group key={u.uuid} noWrap p={'sm'}>
+    <Group key={c.uuid} noWrap align='top' p={'sm'}>
       <Avatar
-        radius={100}
-        src={`https://avatars.dicebear.com/api/${avatar}/${u.email}.svg?background=%23ffffff`}
-        size={86}
-        sx={{ border: `1px solid #dededf` }} />
+        src={c.classTemplate.image}
+        size={200}
+        radius='md'
+      />
       <div>
         <Group noWrap spacing={2}>
           <Text size="xs" sx={{ textTransform: 'uppercase' }} weight={700} color="dimmed">
-            {u.title ? u.title : "Maker"}
+            Taught by {c.instructor.name}
           </Text>
         </Group>
 
         <Text size="lg" weight={500}>
-          <Anchor href={`/users/${u.uuid}`}>{u.name}</Anchor>
+          <Anchor href={`/classes/${c.classTemplate.title}/${c.uuid}`}>{c.classTemplate.title}</Anchor>
+        </Text>
+
+        <Text size="sm" color="dimmed" lineClamp={2}>
+          {c.classTemplate.description}
         </Text>
 
         <Group noWrap spacing={10} mt={3}>
           <Group noWrap spacing={5} mt={3}>
-            <IconAt stroke={1.5} size={16} />
+            <IconUsers stroke={1.5} size={16} />
             <Text size="xs" color="dimmed">
-              {u.email}
+              {c.participants.length}/{c.maxParticipants}
             </Text>
           </Group>
 
           <Group noWrap spacing={5} mt={5}>
-            <IconPhoneCall stroke={1.5} size={16} />
+            <IconClock stroke={1.5} size={16} />
             <Text size="xs" color="dimmed">
-              {formatPhone(u.phone)}
+              {c.duration} minutes
             </Text>
           </Group>
         </Group>
@@ -55,8 +58,8 @@ function renderUsers(users: UsersQuery) {
   ));
 }
 
-const Users = (): JSX.Element => {
-  const [{ fetching: fetchingUsers, data: users }] = useUsersQuery();
+const Classes = (): JSX.Element => {
+  const [{ fetching: fetchingClasses, data: classes }] = useCalendarClassesQuery();
   // const { classes, cx } = useStyles();
   const [layoutRef] = useResizeObserver();
 
@@ -64,10 +67,10 @@ const Users = (): JSX.Element => {
   return (
     <MainLayout layoutRef={layoutRef}>
       <Container size="xl" mb="lg">
-        <Title mb='xl'>User directory</Title>
-        {fetchingUsers
+        <Title mb='xl'>Upcoming classes</Title>
+        {fetchingClasses
           ? (<Container p='lg'><Center><Loader size='xl' /></Center></Container>)
-          : (users.users ? renderUsers(users) : null)
+          : (classes.calendarClasses ? renderClassList(classes) : null)
         }
 
         {/* {!users
@@ -83,4 +86,4 @@ const Users = (): JSX.Element => {
   );
 };
 
-export default Users;
+export default Classes;
