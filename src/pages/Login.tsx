@@ -19,16 +19,15 @@ const Login = (): JSX.Element => {
 
   const form = useForm({
     initialValues: {
-      usernameOrEmail: 'a@a', // TODO: clear after cookies work
-      password: 'aaaaaa',// TODO: clear after cookies work
+      email: '', // TODO: clear after cookies work
+      password: '',// TODO: clear after cookies work
       stayLoggedIn: false,
     },
     validate: (values) => {
       return {
-        usernameOrEmail: /^\S+@\S+$/.test(values.usernameOrEmail) ? null : 'Invalid email',
+        email: /^\S+@\S+$/.test(values.email) ? null : 'Invalid email',
       };
     },
-
   });
 
   return (
@@ -45,7 +44,8 @@ const Login = (): JSX.Element => {
         <Container px={80} py={30} >
           <form onSubmit={form.onSubmit(
             async (values) => {
-              const response = await login({ usernameOrEmail: values.usernameOrEmail, password: values.password });
+              const response = await login({ email: values.email, password: values.password });
+              console.log(response);
               if (response.data?.login.errors) {
                 form.setErrors(toErrorMap(response.data.login.errors));
               } else if (response.data?.login.user) {
@@ -56,7 +56,7 @@ const Login = (): JSX.Element => {
               form.setErrors(validationErrors);
             }
           )}>
-            <TextInput label="Email" placeholder="email@duluthmakerspace.com"  {...form.getInputProps('usernameOrEmail')} required />
+            <TextInput label="Email" placeholder="email@duluthmakerspace.com"  {...form.getInputProps('email')} required />
             <PasswordInput label="Password" placeholder="Your password" {...form.getInputProps('password')} required mt="md" />
             <Group position="apart" mt="md">
               <Checkbox label="Remember me" {...form.getInputProps('stayLoggedIn', { type: 'checkbox' })} />

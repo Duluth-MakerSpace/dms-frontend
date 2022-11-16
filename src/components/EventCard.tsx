@@ -10,6 +10,8 @@ import {
     Avatar,
     createStyles,
 } from '@mantine/core';
+// import { CalendarClass } from '../graphql/graphql';
+import { formatClassDatesShort, formatOpenSlots } from '../utils/stringUtils';
 
 const useStyles = createStyles((theme) => ({
     card: {
@@ -27,8 +29,6 @@ const useStyles = createStyles((theme) => ({
 
     title: {
         display: 'block',
-        marginTop: theme.spacing.md,
-        marginBottom: theme.spacing.xs / 2,
     },
 
     action: {
@@ -44,24 +44,15 @@ const useStyles = createStyles((theme) => ({
 }));
 
 interface EventCardProps {
-    image: string;
+    c: any;
     link: string;
-    title: string;
-    description: string;
     eventType: string;
-    author: {
-        name: string;
-        image: string;
-    };
 }
 
 export function EventCard({
     className,
-    image,
+    c,
     link,
-    title,
-    description,
-    author,
     eventType,
     ...others
 }: EventCardProps & Omit<React.ComponentPropsWithoutRef<'div'>, keyof EventCardProps>) {
@@ -73,7 +64,7 @@ export function EventCard({
         <Card withBorder radius="md" className={cx(classes.card, className)} {...others}>
             <Card.Section>
                 <a {...linkProps}>
-                    <Image src={image} height={180} />
+                    <Image src={c.classTemplate.image} height={180} />
                 </a>
             </Card.Section>
 
@@ -81,32 +72,29 @@ export function EventCard({
                 {eventType}
             </Badge>
 
-            <Text className={classes.title} weight={500} component="a" {...linkProps}>
-                {title}
+            <Text className={classes.title} weight={500} component="a" mt={'sm'} {...linkProps}>
+                {c.classTemplate.title}
+            </Text>
+
+
+            <Text size='sm' color="dimmed" mt={8} mb={10}>
+                {formatClassDatesShort(c.dates)}
             </Text>
 
             <Text size="sm" color="dimmed" lineClamp={3}>
-                {description}
+                {c.classTemplate.description}
             </Text>
 
             <Group position="apart" className={classes.footer}>
                 <Center>
-                    <Avatar src={author.image} size={24} radius="xl" mr="xs" />
+                    <Avatar src={c.instructor.avatar} size={24} radius="xl" mr="xs" />
                     <Text size="sm" inline>
-                        {author.name}
+                        {c.instructor.name}
                     </Text>
                 </Center>
 
                 <Group spacing={8} mr={0}>
-                    <ActionIcon className={classes.action}>
-                        <IconHeart size={16} color={theme.colors.red[6]} />
-                    </ActionIcon>
-                    <ActionIcon className={classes.action}>
-                        <IconBookmark size={16} color={theme.colors.yellow[7]} />
-                    </ActionIcon>
-                    <ActionIcon className={classes.action}>
-                        <IconShare size={16} />
-                    </ActionIcon>
+                    <Text size='sm' color='dimmed'>{formatOpenSlots(c.participants.length, c.maxParticipants)}</Text>
                 </Group>
             </Group>
         </Card>

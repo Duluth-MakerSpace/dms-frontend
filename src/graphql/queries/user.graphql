@@ -1,13 +1,40 @@
 query Users {
   users {
     ...BaseUser
-    name
     phone
-    emerg_contact
+    emergContact
     newsletter
-    privacy_level
-    access_level
+    privacyLevel
+    accessLevel
     title
     bio
+  }
+}
+
+query User($uuid: String!) {
+  user(uuid: $uuid) {
+    uuid
+    id
+    createdAt
+    email
+    name
+    avatar
+    rfid
+    phone
+    emergPhone
+    emergContact
+    newsletter
+    waivered
+    privacyLevel
+    accessLevel
+    title
+    bio
+  }
+}
+
+
+query UsersSearch($search: String!) {
+  usersSearch(search: $search) {
+    ...BaseUser
   }
 }

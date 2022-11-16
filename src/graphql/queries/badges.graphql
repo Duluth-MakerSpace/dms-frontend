@@ -1,0 +1,8 @@
+query Certifications {
+  certifications {
+    uuid
+    title
+    image
+    description
+  }
+}

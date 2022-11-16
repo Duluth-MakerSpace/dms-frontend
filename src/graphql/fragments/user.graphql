@@ -1,6 +1,7 @@
 fragment BaseUser on User {
     uuid
     id
-    username
+    name
     email
+    avatar
 }

@@ -1,6 +1,6 @@
 import { ActionIcon, Anchor, Avatar, Burger, Center, Container, createStyles, Group, Header, Image, Indicator, Menu, Tooltip, UnstyledButton } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconBell, IconBrandSlack, IconChevronDown, IconId, IconLogout, IconMail, IconStar, IconUser } from "@tabler/icons";
+import { IconBell, IconBrandSlack, IconChevronDown, IconId, IconLogout, IconMail, IconSettings, IconStar, IconUser } from "@tabler/icons";
 import { useState } from "react";
 import { SLACK_URL } from "../constants/makerspace";
 import { useLogoutMutation, useMeQuery } from "../graphql/graphql";
@@ -10,6 +10,7 @@ const useStyles = createStyles((theme) => ({
     header: {
         backgroundColor: theme.fn.variant({ variant: 'filled', color: theme.primaryColor }).background,
         borderBottom: 0,
+        position: 'relative'
     },
     inner: {
         display: 'flex',
@@ -84,6 +85,7 @@ export function HeaderMenuColored() {
                 { link: "/users", label: "Users" },
                 { link: "/equipment", label: "Equipment" },
                 { link: "/storage", label: "Storage" },
+                { link: "/contact", label: "Contact" },
             ]
         },
         {
@@ -97,7 +99,17 @@ export function HeaderMenuColored() {
             ]
         },
         { link: "/classes", label: "Classes", },
-        { link: "#2", label: "Support", }
+        { link: "#2", label: "Give", },
+        {
+            link: "/admin",
+            label: "Admin",
+            links: [
+                { link: "/badges", label: "Badges" },
+                { link: "/rfid", label: "RFID" },
+                { link: "/admin/classes", label: "Create a class" },
+                { link: "/admin/events", label: "Create an event" },
+            ]
+        },
     ];
 
     const mainNav = links.map((link) => {
@@ -179,12 +191,18 @@ export function HeaderMenuColored() {
                             {me.me.email}
                         </Menu.Item>
                         <Menu.Item component="span" icon={<IconId size={16} />}>
-                            {me.me.username} {(me.me.id)}
+                            {me.me.name} {(me.me.id)}
+                        </Menu.Item>
+
+                        <Menu.Divider />
+                        <Menu.Label>Links</Menu.Label>
+                        <Menu.Item component="a" href={`/users/${me.me.uuid}`} icon={<IconUser size={16} />}>
+                            Your profile
                         </Menu.Item>
                         <Menu.Divider />
 
                         <Menu.Label>Account</Menu.Label>
-                        <Menu.Item icon={<IconUser size={16} />}>
+                        <Menu.Item component="a" href={`/settings/${me.me.uuid}`} icon={<IconSettings size={16} />}>
                             Manage account
                         </Menu.Item>
                         <Menu.Item onClick={() => logout({})} icon={<IconLogout size={16} stroke={1.5} />}>
@@ -203,11 +221,13 @@ export function HeaderMenuColored() {
     }
 
     return (
-        <Header height={72} className={classes.header} mb={120}>
+        <Header height={72} className={classes.header} >
             <Container fluid>
                 <div className={classes.inner}>
                     <Group spacing={'xs'} className={classes.links}>
-                        <Image src="/dms-logo-rect-white.svg" width={150} p={'xs'} mr={'lg'} />
+                        <Anchor href="/" title='Home'>
+                            <Image src="/dms-logo-rect-white.svg" width={150} p={'xs'} mr={'lg'} />
+                        </Anchor>
                         {mainNav}
                     </Group>
                     <Group spacing={'sm'}>

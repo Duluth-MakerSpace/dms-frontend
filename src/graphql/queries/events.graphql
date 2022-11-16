@@ -1,0 +1,125 @@
+query ClassTemplates {
+  classTemplates {
+    uuid
+    createdAt
+    updatedAt
+    title
+    description
+    image
+  }
+}
+
+query ClassTemplate($uuid: String!) {
+  classTemplate(uuid: $uuid) {
+    description
+    image
+    title
+    uuid
+  }
+}
+
+query EventTemplates {
+  eventTemplates {
+    uuid
+    createdAt
+    updatedAt
+    title
+    description
+    image
+  }
+}
+
+query EventTemplate($uuid: String!) {
+  eventTemplate(uuid: $uuid) {
+    description
+    image
+    title
+    uuid
+  }
+}
+
+query CalendarClasses {
+  calendarClasses {
+    grantsCert {
+      uuid
+    }
+    duration
+    lastDate
+    dates
+    createdAt
+    instructor {
+      uuid
+      name
+    }
+    cost
+    maxParticipants
+    memberCost
+    uuid
+    note
+    classTemplate {
+      description
+      image
+      title
+      uuid
+    }
+    participants {
+      uuid
+    }
+  }
+}
+
+
+query CalendarEvents {
+  calendarEvents {
+    duration
+    date
+    createdAt
+    cost
+    memberCost
+    uuid
+    note
+    eventTemplate {
+      description
+      image
+      title
+      uuid
+    }
+  }
+}
+
+query CalendarClass($uuid: String!) {
+  calendarClass(uuid: $uuid) {
+    uuid
+    createdAt
+    updatedAt
+    maxParticipants
+    cost
+    memberCost
+    dates
+    lastDate
+    duration
+    note
+    grantsCert {
+      description
+      image
+      title
+      uuid
+    }
+    classTemplate {
+      uuid
+      title
+      image
+      description
+    }
+    instructor {
+      ...BaseUser
+    }
+    participants {
+      ...BaseUser
+      waivered
+      emergPhone
+      emergContact
+      phone
+    }
+  }
+}
