@@ -15,3 +15,10 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* react-md-editor workaround */
+.w-md-editor-text-pre>code,
+.w-md-editor-text-input {
+  font-size: 1.0rem !important;
+  line-height: 25px !important;
+}

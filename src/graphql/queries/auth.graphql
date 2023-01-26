@@ -1,6 +1,10 @@
 query Me {
   me {
     ...BaseUser
+    phone
+    emergContact
+    emergPhone
+    accessLevel
   }
 }
 

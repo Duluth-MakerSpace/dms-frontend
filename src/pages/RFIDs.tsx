@@ -2,10 +2,10 @@ import { ActionIcon, Avatar, Box, Button, Center, Container, Divider, Group, Loa
 import { useForm } from "@mantine/form";
 import { useResizeObserver } from "@mantine/hooks";
 import { IconAt, IconPhoneCall, IconX } from "@tabler/icons";
+import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { useRfidLoginMutation, useRfidLogoutMutation, useRfidsQuery } from '../graphql/graphql';
+import { RfidsQuery, useRfidLoginMutation, useRfidLogoutMutation, useRfidsQuery } from '../graphql/graphql';
 import MainLayout from "../layouts/MainLayout";
-
 
 
 
@@ -24,11 +24,38 @@ const RFIDs = (): JSX.Element => {
   });
 
 
+
+  const currentUsers = useCallback(
+    () => {
+      if (!rfids.rfids) {
+        return null;
+      }
+
+      return (
+        <Box>
+          {rfids.rfids.length ?
+            (rfids.rfids.map((key) => (
+              <Group spacing={0} key={key}>
+                <ActionIcon onClick={() => { rfidLogout({ uuid: key }) }}>
+                  <IconX size={18} color='red' />
+                </ActionIcon>
+                {key}
+              </Group>
+            )))
+            : <Text italic>No users found</Text>
+          }
+        </Box>
+      )
+    },
+    [rfids, rfidLogout]
+  )
+
+
+
   return (
     <MainLayout layoutRef={layoutRef}>
-      <Container size="xl" mb="lg">
-        <Title mb='xl'>RFID Simulator</Title>
-
+      <Container size="lg" mb="lg" pt={60}>
+        <Title mb='xl'>RFID Login Simulator</Title>
 
         <Container size={'xs'}>
           <form onSubmit={form.onSubmit(
@@ -57,15 +84,11 @@ const RFIDs = (): JSX.Element => {
 
         <Divider my={'lg'} />
 
+        <Title mb='xl'>Currently in the shop</Title>
+
         {fetchingRfids
           ? (<Container p='lg'><Center><Loader size='xl' /></Center></Container>)
-          : (rfids.rfids ? rfids.rfids.map((rfid) => (
-            <Box>
-              <Group spacing={0}>
-                <ActionIcon onClick={() => rfidLogout({ rfid })}><IconX size={18} color='red' /></ActionIcon>{rfid}
-              </Group>
-            </Box>
-          )) : null)
+          : currentUsers()
         }
       </Container>
     </MainLayout>

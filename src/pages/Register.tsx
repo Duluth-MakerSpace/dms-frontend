@@ -71,15 +71,6 @@ const Register = (): JSX.Element => {
 
   const prevStep = () => setActive((current) => (current > 0 ? current - 1 : current));
 
-
-  const people = [
-    { name: "Sam Maloof", email: "smaloof@email.com" },
-    { name: "George Nakashima", email: "gnakashima@email.com" },
-    { name: "James Krenov", email: "jkrenov@email.com" },
-    { name: "Norm Abram", email: "nabram@email.com" }];
-  const person = people[Math.floor(Math.random() * people.length)];
-
-
   return (
     <ModalLayout layoutRef={layoutRef}>
 
@@ -117,8 +108,8 @@ const Register = (): JSX.Element => {
           )}>
             <Stepper active={active} breakpoint="sm">
               <Stepper.Step icon={<IconUser size={18} />} label="Account info" description="Required">
-                <TextInput label="Name" placeholder={person.name} {...form.getInputProps('name')} required mt="md" />
-                <TextInput label="Email" placeholder={person.email} {...form.getInputProps('email')} required mt="md" />
+                <TextInput label="Name" placeholder='Your name' {...form.getInputProps('name')} required mt="md" />
+                <TextInput label="Email" placeholder='Your email' {...form.getInputProps('email')} required mt="md" />
                 <PasswordInput label="Password" placeholder="Your password" {...form.getInputProps('password')} required mt="md" />
               </Stepper.Step>
 

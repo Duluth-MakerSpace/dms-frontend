@@ -85,6 +85,12 @@ export type ClassTemplateResponse = {
   errors?: Maybe<Array<FieldError>>;
 };
 
+export type CreateMembershipResponse = {
+  __typename?: 'CreateMembershipResponse';
+  errors?: Maybe<Array<FieldError>>;
+  membership?: Maybe<Membership>;
+};
+
 export type EventTemplate = {
   __typename?: 'EventTemplate';
   createdAt: Scalars['String'];
@@ -101,20 +107,53 @@ export type EventTemplateResponse = {
   eventTemplate?: Maybe<EventTemplate>;
 };
 
+export type Fee = {
+  __typename?: 'Fee';
+  amount: Scalars['Float'];
+  createdAt: Scalars['String'];
+  paid: Scalars['Boolean'];
+  quantity: Scalars['Int'];
+  title: Scalars['String'];
+  updatedAt: Scalars['String'];
+  user: User;
+  uuid: Scalars['String'];
+};
+
 export type FieldError = {
   __typename?: 'FieldError';
   field: Scalars['String'];
   message: Scalars['String'];
 };
 
+export type Membership = {
+  __typename?: 'Membership';
+  cost: Scalars['Float'];
+  createdAt: Scalars['String'];
+  days: Scalars['Int'];
+  expiresAt: Scalars['String'];
+  isExpired: Scalars['Boolean'];
+  type: Scalars['String'];
+  updatedAt: Scalars['String'];
+  user: User;
+  uuid: Scalars['String'];
+};
+
+export type MembershipResponse = {
+  __typename?: 'MembershipResponse';
+  expirationDate?: Maybe<Scalars['DateTime']>;
+  status: Scalars['String'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
+  addToClass: CalendarClassResponse;
   changePassword: UserResponse;
   createCalendarClass: CalendarClassResponse;
   createCalendarEvent: CalendarEventResponse;
   createClassTemplate: ClassTemplateResponse;
   createEventTemplate: EventTemplateResponse;
-  createPost: Post;
+  createMembership: CreateMembershipResponse;
+  createPost: PostResponse;
   createUser: UserResponse;
   deleteCalendarClass: Scalars['Boolean'];
   deleteCalendarEvent: Scalars['Boolean'];
@@ -125,12 +164,18 @@ export type Mutation = {
   forgotPassword: Scalars['Boolean'];
   login: UserResponse;
   logout: Scalars['Boolean'];
+  removeFromClass: CalendarClassResponse;
   rfidLogin: Scalars['Boolean'];
   rfidLogout: Scalars['Boolean'];
   updateClassTemplate?: Maybe<ClassTemplate>;
   updateEventTemplate?: Maybe<EventTemplate>;
-  updatePost?: Maybe<Post>;
+  updatePost?: Maybe<PostResponse>;
   updateUser?: Maybe<User>;
+};
+
+
+export type MutationAddToClassArgs = {
+  classUuid: Scalars['String'];
 };
 
 
@@ -177,7 +222,16 @@ export type MutationCreateEventTemplateArgs = {
 };
 
 
+export type MutationCreateMembershipArgs = {
+  cost: Scalars['Float'];
+  days: Scalars['Int'];
+  type: Scalars['String'];
+};
+
+
 export type MutationCreatePostArgs = {
+  category: Scalars['Int'];
+  content: Scalars['String'];
   title: Scalars['String'];
 };
 
@@ -236,6 +290,12 @@ export type MutationLoginArgs = {
 };
 
 
+export type MutationRemoveFromClassArgs = {
+  classUuid: Scalars['String'];
+  userUuid: Scalars['String'];
+};
+
+
 export type MutationRfidLoginArgs = {
   durationSeconds?: InputMaybe<Scalars['Int']>;
   rfid: Scalars['String'];
@@ -243,7 +303,7 @@ export type MutationRfidLoginArgs = {
 
 
 export type MutationRfidLogoutArgs = {
-  rfid: Scalars['String'];
+  uuid: Scalars['String'];
 };
 
 
@@ -264,22 +324,33 @@ export type MutationUpdateEventTemplateArgs = {
 
 
 export type MutationUpdatePostArgs = {
+  category: Scalars['Int'];
+  content: Scalars['String'];
   title: Scalars['String'];
   uuid: Scalars['String'];
 };
 
 
 export type MutationUpdateUserArgs = {
-  title: Scalars['String'];
+  bio: Scalars['String'];
   uuid: Scalars['Int'];
 };
 
 export type Post = {
   __typename?: 'Post';
+  author: User;
+  category: Scalars['Int'];
+  content: Scalars['String'];
   createdAt: Scalars['String'];
   title: Scalars['String'];
   updatedAt: Scalars['String'];
   uuid: Scalars['String'];
+};
+
+export type PostResponse = {
+  __typename?: 'PostResponse';
+  errors?: Maybe<Array<FieldError>>;
+  post?: Maybe<Post>;
 };
 
 export type Query = {
@@ -295,9 +366,12 @@ export type Query = {
   eventTemplate?: Maybe<EventTemplate>;
   eventTemplates: Array<EventTemplate>;
   me?: Maybe<User>;
+  membership?: Maybe<MembershipResponse>;
+  memberships: Array<Membership>;
   post?: Maybe<Post>;
   posts: Array<Post>;
   rfids: Array<Scalars['String']>;
+  titles: Array<Title>;
   user?: Maybe<User>;
   users: Array<User>;
   usersSearch: Array<User>;
@@ -329,8 +403,20 @@ export type QueryEventTemplateArgs = {
 };
 
 
+export type QueryMembershipArgs = {
+  userUuid?: InputMaybe<Scalars['String']>;
+};
+
+
 export type QueryPostArgs = {
   uuid: Scalars['String'];
+};
+
+
+export type QueryPostsArgs = {
+  category?: InputMaybe<Scalars['Int']>;
+  cursor?: InputMaybe<Scalars['DateTime']>;
+  limit?: InputMaybe<Scalars['Int']>;
 };
 
 
@@ -339,8 +425,24 @@ export type QueryUserArgs = {
 };
 
 
+export type QueryUsersArgs = {
+  cursor?: InputMaybe<Scalars['DateTime']>;
+  limit?: InputMaybe<Scalars['Int']>;
+};
+
+
 export type QueryUsersSearchArgs = {
   search: Scalars['String'];
+};
+
+export type Title = {
+  __typename?: 'Title';
+  createdAt: Scalars['String'];
+  title: Scalars['String'];
+  type: Scalars['String'];
+  updatedAt: Scalars['String'];
+  users: Array<User>;
+  uuid: Scalars['String'];
 };
 
 export type User = {
@@ -353,13 +455,17 @@ export type User = {
   email: Scalars['String'];
   emergContact: Scalars['String'];
   emergPhone: Scalars['String'];
+  fees: Array<Fee>;
   id: Scalars['Int'];
+  memberships: Array<Membership>;
   name: Scalars['String'];
   newsletter: Scalars['Boolean'];
   phone: Scalars['String'];
+  posts: Array<Post>;
   privacyLevel: Scalars['Int'];
   rfid?: Maybe<Scalars['String']>;
-  title?: Maybe<Scalars['String']>;
+  taughtClasses: Array<CalendarClass>;
+  title?: Maybe<Title>;
   updatedAt: Scalars['String'];
   uuid: Scalars['String'];
   waivered: Scalars['Boolean'];
@@ -373,7 +479,7 @@ export type UserResponse = {
 
 export type BaseErrorFragment = { __typename?: 'FieldError', field: string, message: string };
 
-export type BaseUserFragment = { __typename?: 'User', uuid: string, id: number, name: string, email: string, avatar?: string | null };
+export type BaseUserFragment = { __typename?: 'User', uuid: string, id: number, name: string, email: string, avatar?: string | null, title?: { __typename?: 'Title', uuid: string, title: string } | null };
 
 export type LoginMutationVariables = Exact<{
   email: Scalars['String'];
@@ -381,7 +487,7 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', uuid: string, id: number, name: string, email: string, avatar?: string | null } | null } };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', phone: string, emergContact: string, emergPhone: string, accessLevel: number, uuid: string, id: number, name: string, email: string, avatar?: string | null, title?: { __typename?: 'Title', uuid: string, title: string } | null } | null } };
 
 export type RegisterMutationVariables = Exact<{
   email: Scalars['String'];
@@ -396,7 +502,7 @@ export type RegisterMutationVariables = Exact<{
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', createUser: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', uuid: string, id: number, name: string, email: string, avatar?: string | null } | null } };
+export type RegisterMutation = { __typename?: 'Mutation', createUser: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', phone: string, emergContact: string, emergPhone: string, accessLevel: number, uuid: string, id: number, name: string, email: string, avatar?: string | null, title?: { __typename?: 'Title', uuid: string, title: string } | null } | null } };
 
 export type ForgotPasswordMutationVariables = Exact<{
   email: Scalars['String'];
@@ -411,7 +517,7 @@ export type ChangePasswordMutationVariables = Exact<{
 }>;
 
 
-export type ChangePasswordMutation = { __typename?: 'Mutation', changePassword: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', uuid: string, id: number, name: string, email: string, avatar?: string | null } | null } };
+export type ChangePasswordMutation = { __typename?: 'Mutation', changePassword: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', phone: string, emergContact: string, emergPhone: string, accessLevel: number, uuid: string, id: number, name: string, email: string, avatar?: string | null, title?: { __typename?: 'Title', uuid: string, title: string } | null } | null } };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -427,16 +533,40 @@ export type RfidLoginMutationVariables = Exact<{
 export type RfidLoginMutation = { __typename?: 'Mutation', rfidLogin: boolean };
 
 export type RfidLogoutMutationVariables = Exact<{
-  rfid: Scalars['String'];
+  uuid: Scalars['String'];
 }>;
 
 
 export type RfidLogoutMutation = { __typename?: 'Mutation', rfidLogout: boolean };
 
+export type RemoveFromClassMutationVariables = Exact<{
+  classUuid: Scalars['String'];
+  userUuid: Scalars['String'];
+}>;
+
+
+export type RemoveFromClassMutation = { __typename?: 'Mutation', removeFromClass: { __typename?: 'CalendarClassResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, calendarClass?: { __typename?: 'CalendarClass', uuid: string } | null } };
+
+export type AddToClassMutationVariables = Exact<{
+  classUuid: Scalars['String'];
+}>;
+
+
+export type AddToClassMutation = { __typename?: 'Mutation', addToClass: { __typename?: 'CalendarClassResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, calendarClass?: { __typename?: 'CalendarClass', uuid: string } | null } };
+
+export type CreateMembershipMutationVariables = Exact<{
+  cost: Scalars['Float'];
+  days: Scalars['Int'];
+  type: Scalars['String'];
+}>;
+
+
+export type CreateMembershipMutation = { __typename?: 'Mutation', createMembership: { __typename?: 'CreateMembershipResponse', membership?: { __typename?: 'Membership', uuid: string, days: number } | null, errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null } };
+
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', uuid: string, id: number, name: string, email: string, avatar?: string | null } | null };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', phone: string, emergContact: string, emergPhone: string, accessLevel: number, uuid: string, id: number, name: string, email: string, avatar?: string | null, title?: { __typename?: 'Title', uuid: string, title: string } | null } | null };
 
 export type RfidsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -487,31 +617,44 @@ export type CalendarClassQueryVariables = Exact<{
 }>;
 
 
-export type CalendarClassQuery = { __typename?: 'Query', calendarClass?: { __typename?: 'CalendarClass', uuid: string, createdAt: string, updatedAt: string, maxParticipants: number, cost: number, memberCost: number, dates: Array<string>, lastDate: string, duration: number, note?: string | null, grantsCert?: { __typename?: 'Certification', description?: string | null, image?: string | null, title: string, uuid: string } | null, classTemplate: { __typename?: 'ClassTemplate', uuid: string, title: string, image?: string | null, description?: string | null }, instructor: { __typename?: 'User', uuid: string, id: number, name: string, email: string, avatar?: string | null }, participants: Array<{ __typename?: 'User', waivered: boolean, emergPhone: string, emergContact: string, phone: string, uuid: string, id: number, name: string, email: string, avatar?: string | null }> } | null };
+export type CalendarClassQuery = { __typename?: 'Query', calendarClass?: { __typename?: 'CalendarClass', uuid: string, createdAt: string, updatedAt: string, maxParticipants: number, cost: number, memberCost: number, dates: Array<string>, lastDate: string, duration: number, note?: string | null, grantsCert?: { __typename?: 'Certification', description?: string | null, image?: string | null, title: string, uuid: string } | null, classTemplate: { __typename?: 'ClassTemplate', uuid: string, title: string, image?: string | null, description?: string | null }, instructor: { __typename?: 'User', uuid: string, id: number, name: string, email: string, avatar?: string | null, title?: { __typename?: 'Title', uuid: string, title: string } | null }, participants: Array<{ __typename?: 'User', waivered: boolean, emergPhone: string, emergContact: string, phone: string, uuid: string, id: number, name: string, email: string, avatar?: string | null, title?: { __typename?: 'Title', uuid: string, title: string } | null }> } | null };
 
-export type PostsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type PostsQuery = { __typename?: 'Query', posts: Array<{ __typename?: 'Post', title: string, createdAt: string, updatedAt: string, uuid: string }> };
-
-export type UsersQueryVariables = Exact<{ [key: string]: never; }>;
+export type MembershipQueryVariables = Exact<{
+  userUuid?: InputMaybe<Scalars['String']>;
+}>;
 
 
-export type UsersQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', phone: string, emergContact: string, newsletter: boolean, privacyLevel: number, accessLevel: number, title?: string | null, bio?: string | null, uuid: string, id: number, name: string, email: string, avatar?: string | null }> };
+export type MembershipQuery = { __typename?: 'Query', membership?: { __typename?: 'MembershipResponse', status: string, expirationDate?: any | null } | null };
+
+export type PostsQueryVariables = Exact<{
+  limit?: InputMaybe<Scalars['Int']>;
+  category?: InputMaybe<Scalars['Int']>;
+  cursor?: InputMaybe<Scalars['DateTime']>;
+}>;
+
+
+export type PostsQuery = { __typename?: 'Query', posts: Array<{ __typename?: 'Post', uuid: string, createdAt: string, category: number, title: string, content: string, author: { __typename?: 'User', uuid: string, id: number, name: string, email: string, avatar?: string | null, title?: { __typename?: 'Title', uuid: string, title: string } | null } }> };
+
+export type UsersQueryVariables = Exact<{
+  limit?: InputMaybe<Scalars['Int']>;
+}>;
+
+
+export type UsersQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', phone: string, emergContact: string, newsletter: boolean, privacyLevel: number, accessLevel: number, bio?: string | null, uuid: string, id: number, name: string, email: string, avatar?: string | null, posts: Array<{ __typename?: 'Post', uuid: string }>, title?: { __typename?: 'Title', uuid: string, title: string } | null }> };
 
 export type UserQueryVariables = Exact<{
   uuid: Scalars['String'];
 }>;
 
 
-export type UserQuery = { __typename?: 'Query', user?: { __typename?: 'User', uuid: string, id: number, createdAt: string, email: string, name: string, avatar?: string | null, rfid?: string | null, phone: string, emergPhone: string, emergContact: string, newsletter: boolean, waivered: boolean, privacyLevel: number, accessLevel: number, title?: string | null, bio?: string | null } | null };
+export type UserQuery = { __typename?: 'Query', user?: { __typename?: 'User', createdAt: string, rfid?: string | null, phone: string, emergPhone: string, emergContact: string, newsletter: boolean, waivered: boolean, privacyLevel: number, accessLevel: number, bio?: string | null, uuid: string, id: number, name: string, email: string, avatar?: string | null, title?: { __typename?: 'Title', uuid: string, title: string } | null } | null };
 
 export type UsersSearchQueryVariables = Exact<{
   search: Scalars['String'];
 }>;
 
 
-export type UsersSearchQuery = { __typename?: 'Query', usersSearch: Array<{ __typename?: 'User', uuid: string, id: number, name: string, email: string, avatar?: string | null }> };
+export type UsersSearchQuery = { __typename?: 'Query', usersSearch: Array<{ __typename?: 'User', uuid: string, id: number, name: string, email: string, avatar?: string | null, title?: { __typename?: 'Title', uuid: string, title: string } | null }> };
 
 export const BaseErrorFragmentDoc = gql`
     fragment BaseError on FieldError {
@@ -526,6 +669,10 @@ export const BaseUserFragmentDoc = gql`
   name
   email
   avatar
+  title {
+    uuid
+    title
+  }
 }
     `;
 export const LoginDocument = gql`
@@ -536,6 +683,11 @@ export const LoginDocument = gql`
     }
     user {
       ...BaseUser
+      phone
+      emergContact
+      emergPhone
+      accessLevel
+      accessLevel
     }
   }
 }
@@ -563,6 +715,10 @@ export const RegisterDocument = gql`
     }
     user {
       ...BaseUser
+      phone
+      emergContact
+      emergPhone
+      accessLevel
     }
   }
 }
@@ -589,6 +745,10 @@ export const ChangePasswordDocument = gql`
     }
     user {
       ...BaseUser
+      phone
+      emergContact
+      emergPhone
+      accessLevel
     }
   }
 }
@@ -617,18 +777,72 @@ export function useRfidLoginMutation() {
   return Urql.useMutation<RfidLoginMutation, RfidLoginMutationVariables>(RfidLoginDocument);
 };
 export const RfidLogoutDocument = gql`
-    mutation RfidLogout($rfid: String!) {
-  rfidLogout(rfid: $rfid)
+    mutation RfidLogout($uuid: String!) {
+  rfidLogout(uuid: $uuid)
 }
     `;
 
 export function useRfidLogoutMutation() {
   return Urql.useMutation<RfidLogoutMutation, RfidLogoutMutationVariables>(RfidLogoutDocument);
 };
+export const RemoveFromClassDocument = gql`
+    mutation RemoveFromClass($classUuid: String!, $userUuid: String!) {
+  removeFromClass(classUuid: $classUuid, userUuid: $userUuid) {
+    errors {
+      ...BaseError
+    }
+    calendarClass {
+      uuid
+    }
+  }
+}
+    ${BaseErrorFragmentDoc}`;
+
+export function useRemoveFromClassMutation() {
+  return Urql.useMutation<RemoveFromClassMutation, RemoveFromClassMutationVariables>(RemoveFromClassDocument);
+};
+export const AddToClassDocument = gql`
+    mutation AddToClass($classUuid: String!) {
+  addToClass(classUuid: $classUuid) {
+    errors {
+      ...BaseError
+    }
+    calendarClass {
+      uuid
+    }
+  }
+}
+    ${BaseErrorFragmentDoc}`;
+
+export function useAddToClassMutation() {
+  return Urql.useMutation<AddToClassMutation, AddToClassMutationVariables>(AddToClassDocument);
+};
+export const CreateMembershipDocument = gql`
+    mutation CreateMembership($cost: Float!, $days: Int!, $type: String!) {
+  createMembership(cost: $cost, days: $days, type: $type) {
+    membership {
+      uuid
+      days
+    }
+    errors {
+      field
+      message
+    }
+  }
+}
+    `;
+
+export function useCreateMembershipMutation() {
+  return Urql.useMutation<CreateMembershipMutation, CreateMembershipMutationVariables>(CreateMembershipDocument);
+};
 export const MeDocument = gql`
     query Me {
   me {
     ...BaseUser
+    phone
+    emergContact
+    emergPhone
+    accessLevel
   }
 }
     ${BaseUserFragmentDoc}`;
@@ -819,31 +1033,49 @@ export const CalendarClassDocument = gql`
 export function useCalendarClassQuery(options: Omit<Urql.UseQueryArgs<CalendarClassQueryVariables>, 'query'>) {
   return Urql.useQuery<CalendarClassQuery, CalendarClassQueryVariables>({ query: CalendarClassDocument, ...options });
 };
-export const PostsDocument = gql`
-    query Posts {
-  posts {
-    title
-    createdAt
-    updatedAt
-    uuid
+export const MembershipDocument = gql`
+    query membership($userUuid: String) {
+  membership(userUuid: $userUuid) {
+    status
+    expirationDate
   }
 }
     `;
+
+export function useMembershipQuery(options?: Omit<Urql.UseQueryArgs<MembershipQueryVariables>, 'query'>) {
+  return Urql.useQuery<MembershipQuery, MembershipQueryVariables>({ query: MembershipDocument, ...options });
+};
+export const PostsDocument = gql`
+    query Posts($limit: Int, $category: Int, $cursor: DateTime) {
+  posts(limit: $limit, category: $category, cursor: $cursor) {
+    uuid
+    createdAt
+    category
+    title
+    content
+    author {
+      ...BaseUser
+    }
+  }
+}
+    ${BaseUserFragmentDoc}`;
 
 export function usePostsQuery(options?: Omit<Urql.UseQueryArgs<PostsQueryVariables>, 'query'>) {
   return Urql.useQuery<PostsQuery, PostsQueryVariables>({ query: PostsDocument, ...options });
 };
 export const UsersDocument = gql`
-    query Users {
-  users {
+    query Users($limit: Int) {
+  users(limit: $limit) {
     ...BaseUser
     phone
     emergContact
     newsletter
     privacyLevel
     accessLevel
-    title
     bio
+    posts {
+      uuid
+    }
   }
 }
     ${BaseUserFragmentDoc}`;
@@ -854,12 +1086,8 @@ export function useUsersQuery(options?: Omit<Urql.UseQueryArgs<UsersQueryVariabl
 export const UserDocument = gql`
     query User($uuid: String!) {
   user(uuid: $uuid) {
-    uuid
-    id
+    ...BaseUser
     createdAt
-    email
-    name
-    avatar
     rfid
     phone
     emergPhone
@@ -868,11 +1096,10 @@ export const UserDocument = gql`
     waivered
     privacyLevel
     accessLevel
-    title
     bio
   }
 }
-    `;
+    ${BaseUserFragmentDoc}`;
 
 export function useUserQuery(options: Omit<Urql.UseQueryArgs<UserQueryVariables>, 'query'>) {
   return Urql.useQuery<UserQuery, UserQueryVariables>({ query: UserDocument, ...options });

@@ -6,7 +6,7 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useResizeObserver } from "@mantine/hooks";
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useLoginMutation } from "../graphql/graphql";
 import ModalLayout from "../layouts/ModalLayout";
 import { toErrorMap } from "../utils/toErrorMap";
@@ -14,13 +14,15 @@ import { toErrorMap } from "../utils/toErrorMap";
 
 const Login = (): JSX.Element => {
   const navigate = useNavigate();
+  const { state } = useLocation();
+
   const [{ fetching }, login] = useLoginMutation();
   const [layoutRef] = useResizeObserver();
 
   const form = useForm({
     initialValues: {
-      email: '', // TODO: clear after cookies work
-      password: '',// TODO: clear after cookies work
+      email: '',
+      password: '',
       stayLoggedIn: false,
     },
     validate: (values) => {
@@ -45,11 +47,10 @@ const Login = (): JSX.Element => {
           <form onSubmit={form.onSubmit(
             async (values) => {
               const response = await login({ email: values.email, password: values.password });
-              console.log(response);
               if (response.data?.login.errors) {
                 form.setErrors(toErrorMap(response.data.login.errors));
               } else if (response.data?.login.user) {
-                navigate("/")
+                navigate(state && state.previousPath ? state.previousPath : "/")
               }
             },
             (validationErrors) => {

@@ -1,18 +1,14 @@
-import { Carousel } from '@mantine/carousel';
 import {
-  Box,
-  Center, Container,
-  createStyles, Flex, Image, Text, Grid, Paper, SimpleGrid, Title, Group, Badge, Anchor, Button, Card, ActionIcon
+  Button, Card, Center, Container,
+  createStyles, Group, Image, SimpleGrid, Text, Title
 } from "@mantine/core";
 import { useResizeObserver } from "@mantine/hooks";
-import { IconAward, IconBadge, IconBookmark, IconHeart, IconSchool, IconShare, IconTool } from '@tabler/icons';
-import dayjs from 'dayjs';
+import { IconSchool, IconTool } from '@tabler/icons';
+import { useNavigate } from "react-router-dom";
 // import { useState } from "react";
-import { EventCard } from "../components/EventCard";
-import { NewsCard } from '../components/NewsCard';
-import { DEFAULT_DATE } from '../constants/dateFormats';
-import { useClassTemplatesQuery } from '../graphql/graphql';
+import { useClassTemplatesQuery, useMeQuery } from '../graphql/graphql';
 import MainLayout from "../layouts/MainLayout";
+import { useIsAuth } from "../utils/useIsAuth";
 
 
 const useStyles = createStyles((theme, _params, getRef) => ({
@@ -114,6 +110,8 @@ const useStyles = createStyles((theme, _params, getRef) => ({
 }));
 
 const AdminClasses = (): JSX.Element => {
+  useIsAuth();
+  const navigate = useNavigate();
   const [{ data: classTemplates }] = useClassTemplatesQuery();
   const { classes, cx } = useStyles();
   const [layoutRef] = useResizeObserver();
@@ -122,18 +120,34 @@ const AdminClasses = (): JSX.Element => {
   return (
     <MainLayout layoutRef={layoutRef}>
 
-      <Container size="xl" mb="lg">
+      <Container size="xl" mb="lg" pt='xl'>
         <Title mb='xl'>Schedule a class</Title>
 
 
         <SimpleGrid cols={4}>
 
+          <Card shadow='sm' withBorder radius='md' m='xs' sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div>
+              <Center><Text weight={700}>New class?</Text></Center>
+              <Text color='dimmed' size='sm' mt='sm'>
+                First, create a new template (name, description, image) which can be re-used
+                later.
+              </Text>
+              <Text color='dimmed' size='sm' mt='sm'>
+                Second, find the template on this page. Click 'Schedule' to add an
+                instructor, special notes, date, and time.
+              </Text>
+            </div>
+            <Button fullWidth type="submit" mt="xl">
+              New class template
+            </Button>
+          </Card>
+
           {!classTemplates
             ? null
             : classTemplates?.classTemplates.map((c) => (
 
-
-              <Card shadow='md' withBorder radius="md" m='xs' className={cx(classes.card)} >
+              <Card shadow='md' withBorder radius="md" className={cx(classes.card)} m='xs' >
                 <Card.Section>
                   <a href={c.uuid}>
                     <Image src={c.image} height={140} />
@@ -154,15 +168,8 @@ const AdminClasses = (): JSX.Element => {
                   </Group>
                 </Card.Section>
 
-
-
               </Card>
-              // date={dayjs(parseInt(p.createdAt)).format(DEFAULT_DATE)}
-              // image={"https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=720&q=80                "}
-              // link={`/news/${p.uuid}`}
-              // title={p.title}
 
-              // category={'Test'} />)
             ))}
         </SimpleGrid>
       </Container>

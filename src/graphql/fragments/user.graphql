@@ -4,4 +4,8 @@ fragment BaseUser on User {
     name
     email
     avatar
+    title {
+      uuid
+      title
+    }
 }

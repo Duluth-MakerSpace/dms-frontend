@@ -1,0 +1,12 @@
+query Posts($limit: Int, $category: Int, $cursor: DateTime) {
+  posts(limit: $limit, category: $category, cursor: $cursor) {
+    uuid
+    createdAt
+    category
+    title
+    content
+    author {
+      ...BaseUser
+    }
+  }
+}
