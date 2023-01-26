@@ -1,5 +1,5 @@
 import {
-  Button, Card, Container,
+  Button, Card, Center, Container,
   createStyles, Group, Image, SimpleGrid, Text, Title
 } from "@mantine/core";
 import { useResizeObserver } from "@mantine/hooks";
@@ -7,6 +7,7 @@ import { IconCalendarEvent, IconSchool, IconTool } from '@tabler/icons';
 // import { useState } from "react";
 import { useEventTemplatesQuery } from '../graphql/graphql';
 import MainLayout from "../layouts/MainLayout";
+import { useIsAuth } from "../utils/useIsAuth";
 
 
 const useStyles = createStyles((theme, _params, getRef) => ({
@@ -108,6 +109,8 @@ const useStyles = createStyles((theme, _params, getRef) => ({
 }));
 
 const AdminEvents = (): JSX.Element => {
+  useIsAuth();
+
   const [{ data: templates }] = useEventTemplatesQuery();
   const { classes, cx } = useStyles();
   const [layoutRef] = useResizeObserver();
@@ -116,10 +119,25 @@ const AdminEvents = (): JSX.Element => {
   return (
     <MainLayout layoutRef={layoutRef}>
 
-      <Container size="xl" mb="lg">
+      <Container size="xl" mb="lg" pt='xl'>
         <Title mb='xl'>Schedule an event</Title>
 
         <SimpleGrid cols={4}>
+
+          <Card shadow='md' withBorder radius='md' m='xs'>
+            <Center><Text weight={700}>New event?</Text></Center>
+            <Text color='dimmed' size='sm' mt='sm'>
+              First, create a new template (name, description, image) which can be re-used
+              later.
+            </Text>
+            <Text color='dimmed' size='sm' mt='sm'>
+              Second, find the template on this page and add additional information
+              including the date and time.
+            </Text>
+            <Button fullWidth type="submit" mt="xl">
+              New event template
+            </Button>
+          </Card>
 
           {!templates
             ? null

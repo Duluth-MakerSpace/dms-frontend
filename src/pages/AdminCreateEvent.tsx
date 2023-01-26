@@ -12,6 +12,7 @@ import { useParams } from 'react-router-dom';
 import { useCertificationsQuery, useEventTemplateQuery, useUsersSearchQuery } from '../graphql/graphql';
 import MainLayout from "../layouts/MainLayout";
 import { combineDateTime } from "../utils/dateTimeUtils";
+import { useIsAuth } from "../utils/useIsAuth";
 
 
 const useStyles = createStyles((theme, _params, getRef) => ({
@@ -114,6 +115,7 @@ const useStyles = createStyles((theme, _params, getRef) => ({
 }));
 
 const AdminCreateEvent = (): JSX.Element => {
+  useIsAuth();
   const { templateId: templateId } = useParams();
   const [{ fetching: fetchingTemplate, data: template }] = useEventTemplateQuery({ variables: { uuid: templateId } });
   // const [{ fetching: fetchingUsers, data: users }] = useUsersQuery();
@@ -148,7 +150,7 @@ const AdminCreateEvent = (): JSX.Element => {
 
   return (
     <MainLayout layoutRef={layoutRef}>
-      <Container size="xl" mb="lg">
+      <Container size="xl" mb="lg" pt='xl'>
         <Title mb='xl'>Schedule an event</Title>
 
         {fetchingTemplate

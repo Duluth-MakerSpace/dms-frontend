@@ -1,24 +1,22 @@
-query Users {
-  users {
+query Users($limit: Int) {
+  users(limit: $limit) {
     ...BaseUser
     phone
     emergContact
     newsletter
     privacyLevel
     accessLevel
-    title
     bio
+    posts {
+      uuid
+    }
   }
 }
 
 query User($uuid: String!) {
   user(uuid: $uuid) {
-    uuid
-    id
+    ...BaseUser
     createdAt
-    email
-    name
-    avatar
     rfid
     phone
     emergPhone
@@ -27,7 +25,6 @@ query User($uuid: String!) {
     waivered
     privacyLevel
     accessLevel
-    title
     bio
   }
 }

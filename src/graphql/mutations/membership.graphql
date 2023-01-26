@@ -1,0 +1,12 @@
+mutation CreateMembership($cost: Float!, $days: Int!, $type: String!) {
+  createMembership(cost: $cost, days: $days, type: $type) {
+    membership {
+      uuid
+      days
+    }
+    errors {
+      field
+      message
+    }
+  }
+}

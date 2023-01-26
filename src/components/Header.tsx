@@ -1,7 +1,8 @@
-import { ActionIcon, Anchor, Avatar, Burger, Center, Container, createStyles, Group, Header, Image, Indicator, Menu, Tooltip, UnstyledButton } from "@mantine/core";
+import { ActionIcon, Anchor, Avatar, Burger, Center, Container, createStyles, Group, Header, Image, Indicator, Menu, Text, Tooltip, UnstyledButton } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconBell, IconBrandSlack, IconChevronDown, IconId, IconLogout, IconMail, IconSettings, IconStar, IconUser } from "@tabler/icons";
+import { IconBell, IconBrandSlack, IconCash, IconChevronDown, IconCurrencyDollar, IconLogout, IconPhotoEdit, IconSettings, IconStar, IconTemperaturePlus, IconUser } from "@tabler/icons";
 import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { SLACK_URL } from "../constants/makerspace";
 import { useLogoutMutation, useMeQuery } from "../graphql/graphql";
 
@@ -28,6 +29,14 @@ const useStyles = createStyles((theme) => ({
         [theme.fn.largerThan('sm')]: {
             display: 'none',
         },
+    },
+
+    logo: {
+        transition: '.1s linear transform',
+
+        '&:hover': {
+            transform: 'scale(1.05)'
+        }
     },
 
     link: {
@@ -69,6 +78,7 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export function HeaderMenuColored() {
+    const { pathname } = useLocation();
     const [, logout] = useLogoutMutation();
     const [{ data: me, fetching: loginFetching }] = useMeQuery();
     const [userMenuOpened, setUserMenuOpened] = useState(false);
@@ -78,28 +88,33 @@ export function HeaderMenuColored() {
     const links = [
         {
             link: "/about",
-            label: "About",
+            label: "Organization",
             links: [
-                { link: "/about", label: "About us" },
                 { link: "/membership", label: "Membership" },
+                { link: "/about", label: "About us" },
+                { link: "/contact", label: "Contact" },
+            ]
+        },
+        {
+            link: ".",
+            label: "Workshop",
+            links: [
                 { link: "/users", label: "Users" },
                 { link: "/equipment", label: "Equipment" },
                 { link: "/storage", label: "Storage" },
-                { link: "/contact", label: "Contact" },
             ]
         },
         {
             link: "/news",
             label: "News",
             links: [
-                { link: "/news", label: "Updates" },
-                { link: "/classes", label: "Classes" },
+                { link: "/news", label: "News" },
                 { link: "/events", label: "Events" },
+                { link: "/classes", label: "Classes" },
                 { link: "/projects", label: "Member Projects" }
             ]
         },
         { link: "/classes", label: "Classes", },
-        { link: "#2", label: "Give", },
         {
             link: "/admin",
             label: "Admin",
@@ -184,26 +199,37 @@ export function HeaderMenuColored() {
                         </UnstyledButton>
                     </Menu.Target>
                     <Menu.Dropdown>
-                        <Menu.Label>
-                            Signed in as
-                        </Menu.Label>
-                        <Menu.Item component="span" icon={<IconMail size={16} />}>
-                            {me.me.email}
+
+                        <Menu.Item component={'span'}>
+                            <Text>Signed in as <strong>{me.me.name}</strong></Text>
                         </Menu.Item>
-                        <Menu.Item component="span" icon={<IconId size={16} />}>
-                            {me.me.name} {(me.me.id)}
+                        <Menu.Divider />
+                        <Menu.Label>
+                            Account
+                        </Menu.Label>
+                        <Menu.Item component={Link} to={`/account/fees`} icon={<IconCurrencyDollar size={16} stroke={1.5} />}>
+                            Fees
+                        </Menu.Item>
+                        <Menu.Item component={Link} to={`/account/membership`} icon={<IconCash size={16} stroke={1.5} />}>
+                            Membership
                         </Menu.Item>
 
                         <Menu.Divider />
                         <Menu.Label>Links</Menu.Label>
-                        <Menu.Item component="a" href={`/users/${me.me.uuid}`} icon={<IconUser size={16} />}>
-                            Your profile
+                        <Menu.Item component={Link} to={`/heat`} icon={<IconTemperaturePlus size={16} stroke={1.5} />}>
+                            Demand heat
+                        </Menu.Item>
+                        <Menu.Item component={Link} to={`/posts/create`} icon={<IconPhotoEdit size={16} stroke={1.5} />}>
+                            Create a post
                         </Menu.Item>
                         <Menu.Divider />
 
-                        <Menu.Label>Account</Menu.Label>
-                        <Menu.Item component="a" href={`/settings/${me.me.uuid}`} icon={<IconSettings size={16} />}>
-                            Manage account
+                        <Menu.Label>Website</Menu.Label>
+                        <Menu.Item component={Link} to={`/users/${me.me.uuid}`} icon={<IconUser size={16} stroke={1.5} />}>
+                            Your profile
+                        </Menu.Item>
+                        <Menu.Item component={Link} to={`/account`} icon={<IconSettings size={16} stroke={1.5} />}>
+                            Settings
                         </Menu.Item>
                         <Menu.Item onClick={() => logout({})} icon={<IconLogout size={16} stroke={1.5} />}>
                             Log out
@@ -215,17 +241,17 @@ export function HeaderMenuColored() {
     } else {
         userInfo = (
             <>
-                <a key={'login'} href={'/login'} className={classes.link}>Log in</a>
+                <Link key={'login'} to={'/login'} state={{ previousPath: pathname }} className={classes.link}>Log in</Link>
                 <a key={'register'} href={'/register'} className={classes.link}>Register</a>
             </>);
     }
 
     return (
-        <Header height={72} className={classes.header} >
+        <Header height='auto' className={classes.header} >
             <Container fluid>
                 <div className={classes.inner}>
                     <Group spacing={'xs'} className={classes.links}>
-                        <Anchor href="/" title='Home'>
+                        <Anchor className={classes.logo} href="/" title='Home'>
                             <Image src="/dms-logo-rect-white.svg" width={150} p={'xs'} mr={'lg'} />
                         </Anchor>
                         {mainNav}

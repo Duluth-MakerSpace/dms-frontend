@@ -1,0 +1,21 @@
+mutation RemoveFromClass($classUuid: String!, $userUuid: String!) {
+  removeFromClass(classUuid: $classUuid, userUuid: $userUuid) {
+    errors {
+      ...BaseError
+    }
+    calendarClass {
+      uuid
+    }
+  }
+}
+
+mutation AddToClass($classUuid: String!) {
+  addToClass(classUuid: $classUuid) {
+    errors {
+      ...BaseError
+    }
+    calendarClass {
+      uuid
+    }
+  }
+}

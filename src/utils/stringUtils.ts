@@ -1,3 +1,6 @@
+import dayjs from "dayjs";
+import { SHORT_DAY_DATE_TIME } from "../constants/dateFormats";
+
 export const formatOpenSlots = (signups: number, max: number, expired: boolean = false): string => {
     if (expired) {
         return "Closed";
@@ -16,12 +19,15 @@ export const formatClassDatesShort = (dates: string[], expired: boolean = false)
     if (dates.length === 1) {
         suffix = "";
     } else if (dates.length === 2) {
-        suffix = " (and 1 more session)"
+        suffix = " (+ 1 more session)"
     } else {
-        suffix = ` (and ${dates.length - 1} more sessions)`
+        suffix = ` (+ ${dates.length - 1} more sessions)`
     }
 
-    return `Apr. 1 @ 6pm` + suffix
+    // to do: discombobulate
+    const displayDate = dayjs(new Date(parseInt(dates[0]))).format(SHORT_DAY_DATE_TIME);
+
+    return displayDate + ` ` + suffix
 }
 
 export const formatDuration = (minutes: number): string => {

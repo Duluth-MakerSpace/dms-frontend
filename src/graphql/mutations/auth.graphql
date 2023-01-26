@@ -6,6 +6,11 @@ mutation Login($email: String!, $password: String!) {
     }
     user {
       ...BaseUser
+      phone
+      emergContact
+      emergPhone
+      accessLevel
+      accessLevel
     }
   }
 }
@@ -35,6 +40,10 @@ mutation Register(
     }
     user {
       ...BaseUser
+      phone
+      emergContact
+      emergPhone
+      accessLevel
     }
   }
 }
@@ -50,6 +59,10 @@ mutation ChangePassword($token: String!, $password: String!) {
     }
     user {
       ...BaseUser
+      phone
+      emergContact
+      emergPhone
+      accessLevel
     }
   }
 }
@@ -63,6 +76,6 @@ mutation RfidLogin($rfid: String!, $durationSeconds: Int) {
   rfidLogin(rfid: $rfid, durationSeconds: $durationSeconds)
 }
 
-mutation RfidLogout($rfid: String!) {
-  rfidLogout(rfid: $rfid)
+mutation RfidLogout($uuid: String!) {
+  rfidLogout(uuid: $uuid)
 }

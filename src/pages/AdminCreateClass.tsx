@@ -1,17 +1,18 @@
-import {
-  Box, Center, Container, Text,
-  createStyles, Image, Loader, Paper, SimpleGrid, Title, Card, Anchor, Button, Checkbox, Group, PasswordInput, TextInput, NumberInput, Autocomplete, Select, Badge, Avatar, Stack
-} from "@mantine/core";
-import { Calendar, DatePicker, TimeInput } from "@mantine/dates";
+import { Autocomplete, Avatar, Badge, Box, Button, Card, Center, Container, createStyles, Group, Image, Loader, NumberInput, Select, SimpleGrid, Stack, Text, Title } from "@mantine/core";
+import { DatePicker, TimeInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { useDebouncedValue, useResizeObserver } from "@mantine/hooks";
 import { IconCalendar, IconClock, IconPigMoney, IconUsers } from "@tabler/icons";
+import dayjs from "dayjs";
 import { useState } from "react";
 import { useParams } from 'react-router-dom';
+import { LONG_DAY_DATE_TIME } from "../constants/dateFormats";
 // import { useState } from "react";
 import { useCertificationsQuery, useClassTemplateQuery, useUsersSearchQuery } from '../graphql/graphql';
 import MainLayout from "../layouts/MainLayout";
 import { combineDateTime } from "../utils/dateTimeUtils";
+import { formatDuration } from "../utils/stringUtils";
+import { useIsAuth } from "../utils/useIsAuth";
 
 
 const useStyles = createStyles((theme, _params, getRef) => ({
@@ -114,9 +115,9 @@ const useStyles = createStyles((theme, _params, getRef) => ({
 }));
 
 const AdminCreateClass = (): JSX.Element => {
+  useIsAuth();
   const { templateId: templateId } = useParams();
   const [{ fetching: fetchingClassTemplate, data: classTemplate }] = useClassTemplateQuery({ variables: { uuid: templateId } });
-  // const [{ fetching: fetchingUsers, data: users }] = useUsersQuery();
   const [{ fetching: fetchingBadges, data: badges }] = useCertificationsQuery();
 
 
@@ -155,7 +156,7 @@ const AdminCreateClass = (): JSX.Element => {
 
   return (
     <MainLayout layoutRef={layoutRef}>
-      <Container size="xl" mb="lg">
+      <Container size="xl" mb="lg" pt='xl'>
         <Title mb='xl'>Schedule a class</Title>
 
         {fetchingClassTemplate
@@ -183,12 +184,12 @@ const AdminCreateClass = (): JSX.Element => {
                     <SimpleGrid cols={2}>
                       <Autocomplete
                         label="Instructor"
-                        placeholder="TODO"
+                        placeholder="Search here"
                         // {...form.getInputProps('instructor')}
                         onChange={setInstructorSearch}
                         data={
-                          fetchingInstructorSearchResults
-                            ? ["fetching"]
+                          fetchingInstructorSearchResults && !instructorSearchResults
+                            ? ["Searching..."]
                             : (instructorSearchResults.usersSearch.map((u) => { return { key: u.uuid, value: u.name } }))
                         }
                       />
@@ -232,7 +233,7 @@ const AdminCreateClass = (): JSX.Element => {
                       <DatePicker
                         placeholder="Pick date"
                         label="Event date"
-                        multiple
+                        firstDayOfWeek="sunday"
                         {...form.getInputProps('calendarDates')}
                         icon={<IconCalendar size={16} />}
                       />
@@ -246,12 +247,6 @@ const AdminCreateClass = (): JSX.Element => {
                       />
 
                     </SimpleGrid>
-                    {/* <Calendar
-                      {...form.getInputProps('calendarDates')}
-                      multiple
-                    // value={calendarDates}
-                    // onChange={setCalendarDates}
-                    /> */}
 
                     <Button type="submit" mt="xl" loading={creatingClass}>
                       Schedule class
@@ -268,9 +263,9 @@ const AdminCreateClass = (): JSX.Element => {
                     <Text size={'lg'} weight={700}>{classTemplate.classTemplate.title}</Text>
                     <Group position="apart" mt={'sm'}>
                       <Group spacing={'xs'}>
+                        {/* <UserWithAvatar user={} /> */}
                         <Avatar size={26} variant='filled' radius='xl' color='red' />
                         <Text color={!form.values.instructor && "dimmed"}>
-                          {form.values.instructor ? form.values.instructor : "Choose an instructor"}
                           {instructorSearch ? instructorSearch : "x an instructor"}
                         </Text>
                       </Group>
@@ -300,7 +295,7 @@ const AdminCreateClass = (): JSX.Element => {
                       <Group px={'md'}>
                         <IconClock size={26} stroke={1} />
                         <Stack spacing={0}>
-                          <Text ml={4}>{form.values.duration} minutes</Text>
+                          <Text ml={4}>{formatDuration(form.values.duration)}</Text>
                           <Text ml={4}>Time here</Text>
                         </Stack>
                       </Group>
@@ -310,7 +305,7 @@ const AdminCreateClass = (): JSX.Element => {
                           <Text ml={4}>
                             {form.values.calendarDates
                               && timeSet
-                              && combineDateTime(form.values.calendarDates, timeSet).toString()}</Text> and
+                              && dayjs(combineDateTime(form.values.calendarDates, timeSet)).format(LONG_DAY_DATE_TIME)}</Text>
                           {/* <Text ml={4}>{timeSet?.toString()}</Text> */}
                         </Stack>
                       </Group>

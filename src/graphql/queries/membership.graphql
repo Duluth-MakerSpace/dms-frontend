@@ -1,0 +1,6 @@
+query membership($userUuid: String) {
+  membership(userUuid: $userUuid) {
+    status
+    expirationDate
+  }
+}

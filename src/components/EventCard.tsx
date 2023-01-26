@@ -29,6 +29,8 @@ const useStyles = createStyles((theme) => ({
 
     title: {
         display: 'block',
+        fontWeight: 600,
+        fontSize: 18
     },
 
     action: {
@@ -57,7 +59,7 @@ export function EventCard({
     ...others
 }: EventCardProps & Omit<React.ComponentPropsWithoutRef<'div'>, keyof EventCardProps>) {
     const { classes, cx, theme } = useStyles();
-    const linkProps = { href: link, target: '_blank', rel: 'noopener noreferrer' };
+    const linkProps = { href: link, rel: 'noopener noreferrer' };
     const gradient = eventType === "Class" ? { from: 'orange', to: 'red' } : { from: "cyan", to: "teal" };
 
     return (
@@ -77,11 +79,11 @@ export function EventCard({
             </Text>
 
 
-            <Text size='sm' color="dimmed" mt={8} mb={10}>
+            <Text size='sm' color="red" weight={500} mt={8} mb={10}>
                 {formatClassDatesShort(c.dates)}
             </Text>
 
-            <Text size="sm" color="dimmed" lineClamp={3}>
+            <Text size="sm" color="dimmed" lineClamp={2}>
                 {c.classTemplate.description}
             </Text>
 

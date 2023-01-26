@@ -6,7 +6,7 @@ import { useForm } from "@mantine/form";
 import { useResizeObserver } from "@mantine/hooks";
 import { IconAlertCircle } from "@tabler/icons";
 import { useState } from "react";
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { SLACK_URL } from "../constants/makerspace";
 import { useChangePasswordMutation } from "../graphql/graphql";
 import ModalLayout from "../layouts/ModalLayout";
@@ -52,6 +52,11 @@ const ResetPassword = (): JSX.Element => {
                 <Center mt={'lg'}>
                   <Text>
                     <Anchor href={"/reset-password"}>Reset password again?</Anchor>
+                  </Text>
+                </Center>
+                <Center mt={'lg'}>
+                  <Text>
+                    <Anchor href={"/"}>Go home?</Anchor>
                   </Text>
                 </Center>
               </>
